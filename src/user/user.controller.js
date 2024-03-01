@@ -72,3 +72,48 @@ export const eliminarPerfil = async(req, res)=>{
         return res.status(500).send('Error deleting user')
     }
 }
+
+export const editarPerfil = async(req, res)=>{
+    try{
+        let { id } = req.params
+        let data = req.body
+        if(data.password) return res.status(401).send({message: 'Cannot update password here, update in change password'})
+        if(id == req.user._id){
+            let updatedUser = await User.findOneAndUpdate(
+                {_id: id},
+                data,
+                {new: true}
+            )
+            if(!updatedUser) return res.status(404).send({message: 'User not found, not updated'})
+            return res.send({message: 'User updated succesfully'})
+        }
+        return res.status(401).send({message: 'You are not the updated user'})
+    }catch(err){
+        console.error(err)
+        return res.status(500).send({message: 'Error updating user'})
+    }
+}
+
+export const changePassword = async(req, res)=>{
+    try{
+        let { id } = req.params
+        let data = req.body
+        let logedUser = User.findOne({_id: req.user._id})
+        if(id == req.user._id){
+            if(await checkPassword(data.lastPassword, logedUser.password)){
+                data.password = await encrypt(data.password)
+                let updatedUser = await User.findOneAndUpdate(
+                    {_id: id},
+                    data,
+                    {new: true}
+                )
+                return res.send({message: 'Password updated succesfully'})
+            }
+            return res.send({message: 'The last password not coincide'})
+        }
+        return res.status(401).send({message: 'You are not the updated user'})
+    }catch(err){
+        console.error(err)
+        return res.status(500).send({message: 'Error changing password'})
+    }
+}
