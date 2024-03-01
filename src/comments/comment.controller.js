@@ -25,7 +25,7 @@ export const updateComment = async(req, res)=>{
         if(!foundedComment) return res.status(404).send({message: 'Comment not founded, not updated'})
         if(foundedComment.user = req.user._id){
             let updatedComment = await Comment.findOneAndUpdate(
-                {id: id},
+                {_id: id},
                 data,
                 {new: true}
             )

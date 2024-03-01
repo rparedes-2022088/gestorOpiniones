@@ -12,7 +12,8 @@ const opinionSchema = Schema({
         required: true
     },
     categorie: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'categorie',
         required: true
     },
     content: {
